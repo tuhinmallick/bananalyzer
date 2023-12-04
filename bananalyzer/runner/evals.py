@@ -31,13 +31,12 @@ def validate_json_match(expected: Result, actual: Result) -> None:
             if value is None and key not in actual:
                 actual[key] = None
 
-    diff = DeepDiff(
+    if diff := DeepDiff(
         expected,
         actual,
         ignore_order=True,
         report_repetition=True,
-    )
-    if diff:
+    ):
         # Pretty print both expected and actual results
         pretty_expected = json.dumps(expected, indent=4)
         pretty_actual = json.dumps(actual, indent=4)
@@ -90,12 +89,11 @@ def is_string_similar(actual: str, expected: str, tolerance: int = 2) -> bool:
 def native_count_differences(actual: str, expected: str) -> int:
     non_alnum_actual = "".join(char for char in actual if not char.isalnum())
     non_alnum_expected = "".join(char for char in expected if not char.isalnum())
-    # Compare the sequence of non-alphanumeric characters with a tolerance for
-    # additional/missing characters
-    diff_count = 0
-    for char1, char2 in zip(non_alnum_actual, non_alnum_expected):
-        if char1 != char2:
-            diff_count += 1
+    diff_count = sum(
+        1
+        for char1, char2 in zip(non_alnum_actual, non_alnum_expected)
+        if char1 != char2
+    )
     # Account for length difference if one sequence is longer than the other
     length_diff = abs(len(non_alnum_actual) - len(non_alnum_expected))
     diff_count += length_diff

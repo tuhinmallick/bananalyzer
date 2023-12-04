@@ -49,12 +49,13 @@ V  \
 def parse_args() -> Args:
     file_name = "bananalyzer-agent.py"
     parser = argparse.ArgumentParser(
-        description=f"Run the agent inside a bananalyzer agent definition file "
-        f"against the benchmark",
+        description='Run the agent inside a bananalyzer agent definition file against the benchmark'
     )
     parser.add_argument("path", type=str, help=f"Path to the {file_name} file")
     parser.add_argument(
-        "--headless", action="store_true", help=f"Whether to run headless or not"
+        "--headless",
+        action="store_true",
+        help="Whether to run headless or not",
     )
     parser.add_argument(
         "-s",
@@ -178,16 +179,14 @@ def find_agents(file_path: Path) -> List[AgentRunnerClass]:
     with open(file_path, "r") as source:
         node = ast.parse(source.read())
 
-    runners: List[AgentRunnerClass] = []
-    for clazz in [n for n in node.body if isinstance(n, ast.ClassDef)]:
-        if "AgentRunner" in [getattr(base, "id", "") for base in clazz.bases]:
-            runners.append(
-                AgentRunnerClass(
-                    class_name=clazz.name,
-                    class_path=str(file_path),
-                )
-            )
-
+    runners: List[AgentRunnerClass] = [
+        AgentRunnerClass(
+            class_name=clazz.name,
+            class_path=str(file_path),
+        )
+        for clazz in [n for n in node.body if isinstance(n, ast.ClassDef)]
+        if "AgentRunner" in [getattr(base, "id", "") for base in clazz.bases]
+    ]
     return runners
 
 
@@ -201,7 +200,7 @@ def load_agent_from_path(path: Path) -> AgentRunnerClass:
     for file in files:
         runners.extend(find_agents(file))
 
-    if len(runners) == 0:
+    if not runners:
         raise RuntimeError(f"Could not find any agent runners in {path}")
 
     if len(runners) > 1:

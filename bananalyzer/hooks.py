@@ -27,7 +27,7 @@ def print_field_data(
             if (passed + failed) > 0
             else "N/A"
         )
-        perfect = is_perfect and "✅" or "❌"
+        perfect = "✅" if is_perfect else "❌"
         table_data.append([field, passed, failed, percentage, perfect])
 
     table_data.sort(key=lambda row: row[3], reverse=True)  # type: ignore
@@ -42,12 +42,18 @@ def print_field_data(
         f"{perfect_count / len(results) * 100:.2f}%" if results else "N/A"
     )
 
-    # Add a totals row
-    table_data.append(["-" * len(header) for header in headers])
-    table_data.append(
-        ["Total", total_passed, total_failed, total_percentage, perfect_percentage]
+    table_data.extend(
+        (
+            ["-" * len(header) for header in headers],
+            [
+                "Total",
+                total_passed,
+                total_failed,
+                total_percentage,
+                perfect_percentage,
+            ],
+        )
     )
-
     # Create a table using tabulate
     table = tabulate(table_data, headers=headers, tablefmt="psql")
 
