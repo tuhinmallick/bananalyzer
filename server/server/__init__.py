@@ -35,7 +35,7 @@ def fetch_all_examples() -> ExampleMeta:
     examples = get_all_examples()
     return ExampleMeta(
         count=len(examples),
-        goal_types=list(set([example.type for example in examples])),
+        goal_types=list({example.type for example in examples}),
         examples=examples,
     )
 
